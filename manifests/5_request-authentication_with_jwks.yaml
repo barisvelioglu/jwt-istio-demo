@@ -1,0 +1,29 @@
+apiVersion: "security.istio.io/v1beta1"
+kind: "RequestAuthentication"
+metadata:
+  name: "jwt-example"
+spec:
+  jwtRules:
+  - issuer: "MAESTRO"
+    jwksUri: http://certapi.bar.svc.cluster.local/token/api/v1/validator
+    # jwks: |
+    #   {"keys":[{"e":"AQAB","kty":"RSA","n":"6kt0e4vKNMJ3B9IGFpLGTfgUOfqrBVOVIEjSlnlZnGXYks8wRg95RdEvMKow1CarSd1FIvylCKAXZM_o0OaEIA3S2Y0nqlZtN4TIko1LTb-vEOpPURj3f6xXTzQ9uz4mxpB920qAAn3cUqYzbPJgFqlZAC07FjC37fkQLyW2XXRkyR4w6SBsxHu5oM9KrUmvoj8H6vT60xUu56KFEIPVzXdXD7w1gqTjIXAxZrHRpcsmt7aVg84retsp3PWQe-d2ABe-83n_H3Vwa8es0hHHfBMTWEbZ-MzW5vN7Uhi5b7_BDa2BnjsQVNoTIVoeV31lTJ7t2RmQ7PEJwS3U2c6wTQ"}]}
+---
+apiVersion: "security.istio.io/v1beta1"
+kind: "AuthorizationPolicy"
+metadata:
+  name: "frontend-ingress"
+spec:
+  rules:
+  - to:
+    - operation:
+        paths: ["/token/api/v1/validator", "/token/api/v1/token", "/token/api/v1/ca"]
+    from:
+    - source:
+        notRequestPrincipals: ["*"] 
+  - to:
+    - operation:
+        paths: ["/token/api/v1/health" ]
+    from:
+    - source:
+        requestPrincipals: ["*"]        

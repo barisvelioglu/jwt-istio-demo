@@ -1,0 +1,70 @@
+apiVersion: v1
+items:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: certapi
+    spec:
+      type: ClusterIP
+      selector:
+        app: certapi
+      ports:
+        - name: http
+          protocol: TCP
+          port: 80
+          targetPort: 6565
+  - apiVersion: v1          
+    kind: ServiceAccount
+    metadata:
+      name: certapi
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: certapi-deployment
+    spec:
+      selector:
+        matchLabels:
+          app: certapi
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            app: certapi
+        spec:
+          serviceAccountName: certapi
+          containers:
+            - name: certapi
+              image: "barisv/cert-api:latest"
+              imagePullPolicy: Always
+              env:
+              - name: TLS_CA_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: root-secret
+                    key: "ca.crt"
+              - name: TLS_PUBLIC_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: root-secret
+                    key: "tls.crt"
+              - name: TLS_PRIVATE_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: root-secret
+                    key: "tls.key"                 
+              - name: LOG_FILE_ACTIVE
+                value: "true"
+              - name: LOG_STDOUT_ACTIVE
+                value: "false"
+              volumeMounts:
+              - name: varlog
+                mountPath: /var/log
+          terminationGracePeriodSeconds: 30
+          volumes:
+          - name: varlog
+            hostPath:
+              path: /var/log
+          imagePullSecrets:
+          - name: gitlab-auth
+kind: List
+metadata: {}

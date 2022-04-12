@@ -1,0 +1,39 @@
+kubectl create ns foo
+
+istioctl install -f .\0-0-istio-operator.yaml --set values.gateways.istio-ingressgateway.runAsRoot=true --set profile=demo -y
+
+kubectl label namespace foo istio-injection=enabled
+
+kubectl apply -f .\0-cert-manager.yaml
+
+kubectl apply -f .\1-cert.yaml
+
+kubectl apply -f .\2-cert-api.yaml -n foo
+
+kubectl apply -f .\3_gateway.yaml  -n foo
+
+kubectl apply -f .\4_virtualservice.yaml  -n foo
+
+kubectl apply -f .\5_request-authentication_with_jwks.yaml -n foo
+
+
+kubectl apply -f .\7_httpbin.yaml -n foo
+
+kubectl apply -f .\6_peerAuthentication.yaml -n foo
+
+
+export Token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGFpbXMiOlsiKiJdLCJlbWFpbCI6ImJhcmlzLnZlbGlvZ2x1QGRpZ2l0aGV0YS5jb20iLCJleHAiOjE2NDk5NDMwNTAsImlhdCI6MTY0OTY4Mzg1MCwiaXNzIjoiTUFFU1RSTyIsIm5iZiI6MTY0OTY4Mzg1MCwic3ViIjoiR0VORVJBTCIsInVzZXJJZCI6IjEyMzQ1NiJ9.MgIggBdHznzFkZmCrij9ImNExPn9ahL1yZ2C7wSMepSZ-5jYBiWsfFHOQ0TiiTHklulSwWNHw1kCWydE45RH3If25rbn7pBLavGbhYXvuRBBHGmvR75d-I90lSbVeLw1nerIj-xk5m8quMcUxGi0hWvoWGk6-ufo0OF7lE53ZABABMDo96Sw2pj5LcxDAH7Wgp6IZSbUotkw4gDep6QxZ8--RN6g-1cXKdODOhT7qSWys523fb_GVfKErPpX5TELDintAenf5sjQgJXRX4ksBjOss_wlNCIBGAFTEqap6zaZk8V3_9IaXXAv4JSWhgs7_HQ1f5o-v41M7AbbrcsBbw
+
+curl --header "Authorization: Bearer $Token" https://localhost/token/api/v1/health --insecure
+
+
+
+kubectl logs $(kubectl -n istio-system get pods -n istio-system | grep ingress
+
+kubectl logs $(kubectl -n istio-system get pods -o jsonpath='{.items[0].metadata.name}') -n istio-system | grep ingress
+
+kubectl logs -l app=certapi -c istio-proxy -n foo
+
+
+
+https://stackoverflow.com/questions/66670850/istio-requestauthentication-jwksuri-does-not-resolve-internal-services-names

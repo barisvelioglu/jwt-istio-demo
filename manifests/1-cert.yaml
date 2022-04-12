@@ -1,0 +1,136 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-issuer
+  namespace: istio-system
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: istio-system-selfsigned-ca
+  namespace: istio-system
+spec:
+  isCA: true
+  commonName: maestro-selfsigned-ca
+  secretName: root-secret
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: istio-system-ca-issuer
+  namespace: istio-system
+spec:
+  ca:
+    secretName: root-secret
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: istio-system-selfsigned-tls-secret
+  namespace: istio-system
+spec:
+  isCA: false
+  commonName: istio-system-selfsigned-cert
+  secretName: istio-system-tls-secret
+  duration: 87660h # 10years
+  renewBefore: 360h # 15d  
+  dnsNames:
+  - "*"
+  ipAddresses:
+  - 0.0.0.0
+  issuerRef:
+    name: istio-system-ca-issuer
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: foo-selfsigned-ca
+  namespace: foo
+spec:
+  isCA: true
+  commonName: foo-selfsigned-ca
+  secretName: root-secret
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: foo-ca-issuer
+  namespace: foo
+spec:
+  ca:
+    secretName: root-secret
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: foo-selfsigned-tls-secret
+  namespace: foo
+spec:
+  isCA: false
+  commonName: foo-selfsigned-cert
+  secretName: foo-tls-secret
+  duration: 87660h # 10years
+  renewBefore: 360h # 15d  
+  dnsNames:
+  - "*"
+  - "emqx.infrastructure.svc.cluster.local"
+  - "redis-master.infrastructure.svc.cluster.local"
+  - "mongodb.infrastructure.svc.cluster.local"
+  ipAddresses:
+  - 0.0.0.0
+  issuerRef:
+    name: foo-ca-issuer
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bar-selfsigned-ca
+  namespace: bar
+spec:
+  isCA: true
+  commonName: bar-selfsigned-ca
+  secretName: root-secret
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: bar-ca-issuer
+  namespace: bar
+spec:
+  ca:
+    secretName: root-secret
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bar-selfsigned-tls-secret
+  namespace: bar
+spec:
+  isCA: false
+  commonName: bar-selfsigned-cert
+  secretName: bar-tls-secret
+  duration: 87660h # 10years
+  renewBefore: 360h # 15d  
+  dnsNames:
+  - "*"
+  - "emqx.infrastructure.svc.cluster.local"
+  - "redis-master.infrastructure.svc.cluster.local"
+  - "mongodb.infrastructure.svc.cluster.local"
+  ipAddresses:
+  - 0.0.0.0
+  issuerRef:
+    name: bar-ca-issuer
+    kind: Issuer    

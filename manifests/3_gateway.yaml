@@ -1,0 +1,29 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: httpbin-gateway
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"  
+  - port:
+      number: 15031
+      name: http-other
+      protocol: HTTP
+    hosts:
+    - "*"
+  - port: 
+      number: 443 
+      name: https
+      protocol: HTTPS 
+    tls:
+      mode: SIMPLE
+      credentialName: root-secret # must be the same as secret
+    hosts:
+    - "*"    

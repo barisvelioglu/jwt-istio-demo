@@ -1,0 +1,88 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+  meshConfig:
+    accessLogFile: /dev/stdout
+  components:
+    egressGateways:
+      - name: istio-egressgateway
+        enabled: true
+        k8s:
+          resources:
+            requests:
+              cpu: 10m
+              memory: 40Mi
+              
+    ingressGateways:
+      - name: istio-ingressgateway
+        enabled: true 
+        k8s:
+          service:
+            # loadBalancerIP: 85.105.227.108
+            # loadBalancerSourceRanges: []
+            ports:
+              - name: status-port
+                port: 15020
+                targetPort: 15020
+              - name: http2
+                nodePort: 31380
+                port: 80
+                targetPort: 80
+              - name: https
+                nodePort: 31390
+                port: 443
+              - name: https-emqx
+                targetPort: 18083
+                port: 18083                 
+              - name: tcp-emqx
+                targetPort: 1883
+                port: 1883
+              - name: tls-emqx
+                targetPort: 8883
+                port: 8883     
+              - name: ws-emqx
+                targetPort: 8083
+                port: 8083
+              - name: wss-emqx
+                targetPort: 8084
+                port: 8084                                                               
+              - name: tcp
+                nodePort: 31400
+                port: 31400
+              - name: https-kiali
+                port: 15029
+                targetPort: 15029
+              - name: https-prometheus
+                port: 15030
+                targetPort: 15030
+              - name: https-grafana
+                port: 15031
+                targetPort: 15031
+              - name: https-tracing
+                port: 15032
+                targetPort: 15032
+              - name: tls
+                port: 15443
+                targetPort: 15443
+
+  values:
+    global:
+      proxy:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 40Mi
+
+    pilot:
+      autoscaleEnabled: true
+
+    gateways:
+      istio-egressgateway:
+        autoscaleEnabled: true
+        autoscaleMin: 1
+        autoscaleMax : 5
+      istio-ingressgateway:
+        autoscaleEnabled: true
+        autoscaleMin: 1
+        autoscaleMax : 5
+        runAsRoot: true                

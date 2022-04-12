@@ -1,0 +1,13 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: se-auth
+spec:
+  hosts:
+  - "host.docker.internal"
+  ports:
+  - number: 443
+    name: https
+    protocol: TLS
+  resolution: DNS
+  location: MESH_EXTERNAL
